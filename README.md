@@ -69,7 +69,7 @@ mqtt_statestream:
 
 camera:
   - platform: generic
-    name: Host instance camera feed
+    name: My Camera
     host: http://127.0.0.5:8123
     topic: /topic/camera/entity_picture
 ```
