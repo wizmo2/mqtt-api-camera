@@ -66,6 +66,7 @@ mqtt_statestream:
   include:
     domains:
       - camera
+      - amcrest
 
 camera:
   - platform: generic
