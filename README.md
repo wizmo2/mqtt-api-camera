@@ -61,6 +61,12 @@ In this section, you find some real-life examples of how to use this camera plat
 If you are running more than one Home Assistant instance (let's call them the 'host' and 'receiver' instances) you may wish to display the camera feed from the host instance on the receiver instance. You can use the [REST API](https://developers.home-assistant.io/docs/api/rest/#get-apicamera_proxycameraentity_id) to access the camera feed on the host (IP address 127.0.0.5; Port 8123) using [mqtt_statestream](https://www.home-assistant.io/integrations/mqtt_statestream/) and display it on the receiver instance by configuring the receiver with the following:
 
 ```yaml
+mqtt_statestream:
+  base_topic: home
+  include:
+    domains:
+      - camera
+
 camera:
   - platform: generic
     name: Host instance camera feed
