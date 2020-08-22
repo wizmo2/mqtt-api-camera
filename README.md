@@ -1,4 +1,3 @@
-# mqtt-api-camera
 ---
 title: "Generic IP Camera"
 description: "Instructions on how to integrate IP cameras within Home Assistant."
