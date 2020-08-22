@@ -164,9 +164,5 @@ class MqttAPICamera(Camera):
     def name(self):
         """Return the name of this camera."""
         return self._name
-        
-    async def stream_source(self):
-        """Return the source of the stream. (None for ths Camera)"""
-        return None
 
 
