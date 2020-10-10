@@ -68,7 +68,7 @@ mqtt_statestream:
       - amcrest
 
 camera:
-  - platform: generic
+  - platform: mqtt-api
     name: My Camera
     host: http://127.0.0.5:8123
     topic: /topic/camera/entity_picture
