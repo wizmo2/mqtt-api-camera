@@ -45,7 +45,7 @@ PLATFORM_SCHEMA = (
             ),            
             vol.Optional(CONF_PASSWORD): cv.string,
             vol.Optional(CONF_USERNAME): cv.string,
-            vol.Optional(CONF_FRAMERATE, default=1): vol.Any(
+            vol.Optional(CONF_FRAMERATE, default=2): vol.Any(
                 cv.small_float, cv.positive_int
             ),            
             vol.Optional(CONF_VERIFY_SSL, default=True): cv.boolean,        
@@ -111,7 +111,6 @@ class MqttAPICamera(Camera):
         """Return supported features for this camera. 0 for this camera"""
         return 0
 
-        
     def camera_image(self):
         """Return bytes of camera image."""
         return asyncio.run_coroutine_threadsafe(
@@ -164,5 +163,4 @@ class MqttAPICamera(Camera):
     def name(self):
         """Return the name of this camera."""
         return self._name
-
-
+        
