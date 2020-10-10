@@ -61,7 +61,7 @@ If you are running more than one Home Assistant instance (let's call them the 'h
 
 ```yaml
 mqtt_statestream:
-  base_topic: home
+  base_topic: topic
   include:
     domains:
       - camera
