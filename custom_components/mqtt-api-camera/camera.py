@@ -36,7 +36,7 @@ DEFAULT_NAME = "MQTT API Camera"
 PLATFORM_SCHEMA = (
     mqtt.MQTT_BASE_PLATFORM_SCHEMA.extend(
         {
-            vol.Optional(CONF_DEVICE): mqtt.MQTT_ENTITY_DEVICE_INFO_SCHEMA,
+            #vol.Optional(CONF_DEVICE): mqtt.MQTT_ENTITY_DEVICE_INFO_SCHEMA,
             vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
             vol.Required(CONF_TOPIC): mqtt.valid_subscribe_topic,
             vol.Required(CONF_HOST) : cv.string,
