@@ -1,9 +1,10 @@
 {
   "domain": "mqtt_api",
   "name": "MQTT API",
+  "version": "1.0.1",
   "config_flow": true,
   "documentation": "https://www.home-assistant.io/integrations/mqtt",
   "requirements": ["paho-mqtt==1.5.0"],
   "dependencies": ["http", "mqtt"],
-  "codeowners": ["@home-assistant/core", "@emontnemery"]
+  "codeowners": ["@wizmo2"]
 }
