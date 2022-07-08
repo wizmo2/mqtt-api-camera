@@ -11,7 +11,7 @@ To enable this camera in your installation, add the following to your `configura
 camera:
   - platform: mqtt-api
     host: http://192.168.1.1:8123
-    topic: /topic/camera/entity_picture
+    state_topic: /topic/camera/entity_picture
 ```
 
 {% configuration %}
@@ -19,28 +19,11 @@ name:
   description: This parameter allows you to override the name of your camera.
   required: false
   type: string
-username:
-  description: The username for accessing your camera.
-  required: false
-  type: string
-password:
-  description: The password for accessing your camera.
-  required: false
-  type: string
-authentication:
-  description: "Type for authenticating the requests `basic` or `digest`."
-  required: false
-  default: basic
-  type: string
 framerate:
   description: The number of frames-per-second (FPS) of the stream. Can cause heavy traffic on the network and/or heavy load on the camera.
   required: false
   type: integer
-verify_ssl:
-  description: Enable or disable SSL certificate verification. Set to false to use an http-only camera, or you have a self-signed SSL certificate and haven't installed the CA certificate to enable verification.
-  required: false
-  default: true
-  type: boolean
+
 {% endconfiguration %}
 
 ## Examples
@@ -63,5 +46,5 @@ camera:
   - platform: mqtt-api
     name: My Camera
     host: http://127.0.0.5:8123
-    topic: /topic/camera/entity_picture
+    state_topic: /topic/camera/entity_picture
 ```
