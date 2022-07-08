@@ -56,14 +56,19 @@ class MqttAPICamera(Camera):
         self._config = device_info
         self._topic = device_info.get(CONF_TOPIC)
         self._qos = device_info.get(CONF_QOS)
-        self._name = device_info.get(CONF_NAME)
         self._host = device_info.get(CONF_HOST)
-        self._still_image_url = None
         self._frame_interval = device_info[CONF_FRAMERATE]
         self._supported_features = 0
+        self._auth = None
+
+        name = device_info.get(CONF_NAME)
+        if name:
+            self._attr_name = name
+        self._attr_unique_id = "mqttapi-{}_{}".format(self._host, self._topic)
 
         self._auth = None
 
+        self._still_image_url = None
         self._last_image = None
         self._last_url = None
 
@@ -110,16 +115,12 @@ class MqttAPICamera(Camera):
             response.raise_for_status()
             self._last_image = response.content
         except httpx.TimeoutException:
-            _LOGGER.error("Timeout getting camera image from %s", self._name)
+            _LOGGER.error("Timeout getting camera image from %s", self._attr_name)
             return self._last_image
         except (httpx.RequestError, httpx.HTTPStatusError) as err:
-            _LOGGER.error("Error getting new camera image from %s: %s", self._name, err)
+            _LOGGER.error("Error getting new camera image from %s: %s", self._attr_name, err)
             return self._last_image
 
         self._last_url = url
         return self._last_image
 
-    @property
-    def name(self):
-        """Return the name of this camera."""
-        return self._name
