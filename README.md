@@ -1,13 +1,5 @@
----
-title: "MQTT API Camera"
-description: "Instructions on how to integrate instant-to-instant cameras within Home Assistant."
-ha_category:
-  - Camera
-logo: home-assistant.png
-ha_release: pre 0.7
-ha_iot_class: Configurable
-ha_domain: camera
----
+# MQTT API Camera
+
 Use the 'mqtt-api' HA custom camera component to provide instant-to-instant support for cameras using mqtt statestream
 
 ## Configuration
