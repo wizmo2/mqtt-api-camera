@@ -7,10 +7,20 @@ import voluptuous as vol
 from urllib.parse import urljoin
 
 from homeassistant.components import mqtt
-from homeassistant.components.camera import DEFAULT_CONTENT_TYPE,Camera
+from homeassistant.components.mqtt.const import (
+    CONF_QOS,
+    CONF_STATE_TOPIC as CONF_TOPIC
+)
+from homeassistant.components.camera import (
+    Camera,
+    DEFAULT_CONTENT_TYPE,
+    PLATFORM_SCHEMA as PARENT_PLATFORM_SCHEMA,
+)
+
 from homeassistant.const import (
     CONF_AUTHENTICATION,
     CONF_NAME,
+	CONF_HOST,
     CONF_PASSWORD,
     CONF_USERNAME,
     CONF_VERIFY_SSL,
@@ -25,20 +35,15 @@ from homeassistant.helpers.reload import async_setup_reload_service
 from . import DOMAIN, PLATFORMS
 
 _LOGGER = logging.getLogger(__name__)
-
-CONF_TOPIC = "topic"
-CONF_HOST = "host"
 CONF_CONTENT_TYPE = "content_type"
 CONF_FRAMERATE = "framerate"
 
 DEFAULT_NAME = "MQTT API Camera"
 GET_IMAGE_TIMEOUT = 10
 
-PLATFORM_SCHEMA = mqtt.MQTT_BASE_PLATFORM_SCHEMA.extend(
+PLATFORM_SCHEMA = PARENT_PLATFORM_SCHEMA.extend(
     {
-        # vol.Optional(CONF_DEVICE): mqtt.MQTT_ENTITY_DEVICE_INFO_SCHEMA,
         vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
-        vol.Required(CONF_TOPIC): mqtt.valid_subscribe_topic,
         vol.Required(CONF_HOST): cv.string,
         vol.Optional(CONF_AUTHENTICATION, default=HTTP_BASIC_AUTHENTICATION): vol.In(
             [HTTP_BASIC_AUTHENTICATION, HTTP_DIGEST_AUTHENTICATION]
@@ -51,7 +56,7 @@ PLATFORM_SCHEMA = mqtt.MQTT_BASE_PLATFORM_SCHEMA.extend(
         ),
         vol.Optional(CONF_VERIFY_SSL, default=True): cv.boolean,
     }
-)
+).extend(mqtt.config.MQTT_RO_SCHEMA.schema)
 
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
@@ -71,6 +76,8 @@ class MqttAPICamera(Camera):
         super().__init__()
         self.hass = hass
         self._config = device_info
+        self._topic = device_info.get(CONF_TOPIC)
+        self._qos = device_info.get(CONF_QOS)
         self._authentication = device_info.get(CONF_AUTHENTICATION)
         self._name = device_info.get(CONF_NAME)
         self._host = device_info.get(CONF_HOST)
@@ -103,9 +110,9 @@ class MqttAPICamera(Camera):
 
         await mqtt.async_subscribe(
             self.hass,
-            self._config[CONF_TOPIC],
+            self._topic,
             message_received,
-            self._config[mqtt.CONF_QOS],
+            self._qos,
         )
 
     @property

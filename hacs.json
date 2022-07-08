@@ -1,0 +1,5 @@
+{
+  "name": "MQTT API Camera",
+  "content_in_root": false,
+  "homeassistant": "2022.7"
+}
