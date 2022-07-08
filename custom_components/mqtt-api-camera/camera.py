@@ -7,26 +7,11 @@ import voluptuous as vol
 from urllib.parse import urljoin
 
 from homeassistant.components import mqtt
-from homeassistant.components.mqtt.const import (
-    CONF_QOS,
-    CONF_STATE_TOPIC as CONF_TOPIC
-)
-from homeassistant.components.camera import (
-    Camera,
-    DEFAULT_CONTENT_TYPE,
-    PLATFORM_SCHEMA as PARENT_PLATFORM_SCHEMA,
-)
+from homeassistant.components.mqtt.const import CONF_QOS, CONF_STATE_TOPIC as CONF_TOPIC
+from homeassistant.components.camera import Camera, PLATFORM_SCHEMA as PARENT_PLATFORM_SCHEMA
 
-from homeassistant.const import (
-    CONF_AUTHENTICATION,
-    CONF_NAME,
-	CONF_HOST,
-    CONF_PASSWORD,
-    CONF_USERNAME,
-    CONF_VERIFY_SSL,
-    HTTP_BASIC_AUTHENTICATION,
-    HTTP_DIGEST_AUTHENTICATION,
-)
+from homeassistant.const import CONF_NAME, CONF_HOST
+
 from homeassistant.exceptions import TemplateError
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.httpx_client import get_async_client
@@ -45,16 +30,9 @@ PLATFORM_SCHEMA = PARENT_PLATFORM_SCHEMA.extend(
     {
         vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
         vol.Required(CONF_HOST): cv.string,
-        vol.Optional(CONF_AUTHENTICATION, default=HTTP_BASIC_AUTHENTICATION): vol.In(
-            [HTTP_BASIC_AUTHENTICATION, HTTP_DIGEST_AUTHENTICATION]
-        ),
-        vol.Optional(CONF_PASSWORD): cv.string,
-        vol.Optional(CONF_USERNAME): cv.string,
-        vol.Optional(CONF_CONTENT_TYPE, default=DEFAULT_CONTENT_TYPE): cv.string,
         vol.Optional(CONF_FRAMERATE, default=2): vol.Any(
             cv.small_float, cv.positive_int
         ),
-        vol.Optional(CONF_VERIFY_SSL, default=True): cv.boolean,
     }
 ).extend(mqtt.config.MQTT_RO_SCHEMA.schema)
 
@@ -78,24 +56,13 @@ class MqttAPICamera(Camera):
         self._config = device_info
         self._topic = device_info.get(CONF_TOPIC)
         self._qos = device_info.get(CONF_QOS)
-        self._authentication = device_info.get(CONF_AUTHENTICATION)
         self._name = device_info.get(CONF_NAME)
         self._host = device_info.get(CONF_HOST)
         self._still_image_url = None
-        self._frame_interval = 1 / device_info[CONF_FRAMERATE]
+        self._frame_interval = device_info[CONF_FRAMERATE]
         self._supported_features = 0
-        self.content_type = device_info[CONF_CONTENT_TYPE]
-        self.verify_ssl = device_info[CONF_VERIFY_SSL]
-        username = device_info.get(CONF_USERNAME)
-        password = device_info.get(CONF_PASSWORD)
 
-        if username and password:
-            if self._authentication == HTTP_DIGEST_AUTHENTICATION:
-                self._auth = httpx.DigestAuth(username=username, password=password)
-            else:
-                self._auth = httpx.BasicAuth(username=username, password=password)
-        else:
-            self._auth = None
+        self._auth = None
 
         self._last_image = None
         self._last_url = None
@@ -136,7 +103,7 @@ class MqttAPICamera(Camera):
             return self._last_image
 
         try:
-            async_client = get_async_client(self.hass, verify_ssl=self.verify_ssl)
+            async_client = get_async_client(self.hass)
             response = await async_client.get(
                 url, auth=self._auth, timeout=GET_IMAGE_TIMEOUT
             )
