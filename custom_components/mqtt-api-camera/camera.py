@@ -1,4 +1,5 @@
 """Camera that loads a picture from an API link specified by a MQTT topic."""
+
 from __future__ import annotations
 import logging
 
@@ -8,7 +9,10 @@ from urllib.parse import urljoin
 
 from homeassistant.components import mqtt
 from homeassistant.components.mqtt.const import CONF_QOS, CONF_STATE_TOPIC as CONF_TOPIC
-from homeassistant.components.camera import Camera, PLATFORM_SCHEMA as PARENT_PLATFORM_SCHEMA
+from homeassistant.components.camera import (
+    Camera,
+    PLATFORM_SCHEMA as PARENT_PLATFORM_SCHEMA,
+)
 
 from homeassistant.const import CONF_NAME, CONF_HOST
 
@@ -20,7 +24,6 @@ from homeassistant.helpers.reload import async_setup_reload_service
 from . import DOMAIN, PLATFORMS
 
 _LOGGER = logging.getLogger(__name__)
-CONF_CONTENT_TYPE = "content_type"
 CONF_FRAMERATE = "framerate"
 
 DEFAULT_NAME = "MQTT API Camera"
@@ -58,7 +61,6 @@ class MqttAPICamera(Camera):
         self._qos = device_info.get(CONF_QOS)
         self._host = device_info.get(CONF_HOST)
         self._frame_interval = device_info[CONF_FRAMERATE]
-        self._supported_features = 0
         self._auth = None
 
         name = device_info.get(CONF_NAME)
@@ -79,6 +81,7 @@ class MqttAPICamera(Camera):
             """Handle new MQTT messages."""
             self._still_image_url = urljoin(self._host, msg.payload.replace('"', ""))
             _LOGGER.info("Updating still image url to '%s'", self._still_image_url)
+            self.schedule_update_ha_state()
 
         await mqtt.async_subscribe(
             self.hass,
@@ -86,11 +89,6 @@ class MqttAPICamera(Camera):
             message_received,
             self._qos,
         )
-
-    @property
-    def supported_features(self):
-        """Return supported features for this camera."""
-        return self._supported_features
 
     @property
     def frame_interval(self):
@@ -118,9 +116,10 @@ class MqttAPICamera(Camera):
             _LOGGER.error("Timeout getting camera image from %s", self._attr_name)
             return self._last_image
         except (httpx.RequestError, httpx.HTTPStatusError) as err:
-            _LOGGER.error("Error getting new camera image from %s: %s", self._attr_name, err)
+            _LOGGER.error(
+                "Error getting new camera image from %s: %s", self._attr_name, err
+            )
             return self._last_image
 
         self._last_url = url
         return self._last_image
-

@@ -1,6 +1,6 @@
 # MQTT API Camera
 
-Use the 'mqtt-api' HA custom camera component to provide instant-to-instant support for cameras using mqtt statestream
+Use the 'mqtt-api' HA custom camera component to provide instant-to-instant support for entity_pictures using mqtt statestream.  For example, live camera feeds or media player images
 
 ## Configuration
 
